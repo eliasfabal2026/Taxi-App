@@ -1,1 +1,35 @@
+yaml
 
+name: Build Android APK
+
+on:
+  workflow_dispatch: # Permite activar la compilación manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17' # Cambia a 11 o 21 según los requisitos del proyecto
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Dar permisos de ejecución a Gradle
+        run: chmod +x ./gradlew
+
+      - name: Compilar APK de Depuración (Debug)
+        run: ./gradlew assembleDebug
+
+      - name: Subir APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
